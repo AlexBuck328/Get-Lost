@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8' />
+    <title>Montata Recreation</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css' rel='stylesheet' />
+    <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+    <script src="https://d3js.org/d3-fetch.v1.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+    <script>
+        mapboxgl.accessToken =
+            'pk.eyJ1IjoiYWxleGJ1Y2szMjgiLCJhIjoiY2szcDZsdmFsMW9rbDNubjMydm9rNGJpMyJ9.05szss9EHEoVBbGYajbPZA';
+        var map = new mapboxgl.Map({
+            container: 'map', // container id
+            style: 'mapbox://styles/alexbuck328/ckf35kdq60d4y19mmuh3ca2rg', // stylesheet location
+            center: [-111.7989, 45.2758], // starting position
+            zoom: 5.56 // starting zoom
+        });
+
+        map.on('load', function () {
+            map.addSource('mtAirports', {
+                type: 'vector',
+                url: 'mapbox://alexbuck328.ckf1cqnw50ocx2cnppcrkj8ds-2bwo8' // update with your mapbox username and the tileset ID
+            });
+
+            // add plane icon for location marker
+            map.loadImage('https://upload.wikimedia.org/wikipedia/commons/a/a4/Map_symbol_airport_02.png',
+                function (error, image) {
+                    if (error) throw error;
+                    map.addImage('plane', image);
+                });
+
+            // add airport locations to map
+            map.addLayer({
+                'id': 'mtAir', // provide an id for later reference
+                'type': 'circle',
+                'source': 'mtAirports', // refers to the source name we entered above
+                'source-layer': 'mtAirports', // refers to the name of the tileset hosted on Mapbox Studio
+                'type': 'symbol',
+                'layout': {
+                    'icon-image': 'plane',
+                    'icon-size': .04,
+                    'icon-allow-overlap': true,
+                }
+            });
+
+
+            map.addSource('mtRec', {
+                type: 'vector',
+                url: 'mapbox://alexbuck328.ckf1ctvx807h225o9b2wc7rnz-2nubg' // update with your mapbox username and the tileset ID
+            });
+
+            // add rec icon for location marker
+            map.loadImage('https://upload.wikimedia.org/wikipedia/commons/0/0c/SharedUseMarkerSymbol.png',
+                function (error, image) {
+                    if (error) throw error;
+                    map.addImage('rec', image);
+                });
+
+            // add recreation locations to map
+            map.addLayer({
+                'id': 'mtRec', // provide an id for later reference
+                'type': 'circle',
+                'source': 'mtRec', // refers to the source name we entered above
+                'source-layer': 'mtRec', // refers to the name of the tileset hosted on Mapbox Studio
+                'type': 'symbol',
+                'layout': {
+                    'icon-image': 'rec',
+                    'icon-size': .04,
+                    'icon-allow-overlap': true,
+                }
+            });
+
+            map.addSource('nearest-recArea', {
+                type: 'geojson',
+                data: {
+                    type: 'FeatureCollection',
+                    features: []
+                }
+            });
+
+
+        }) // add layers
+
+
+        var popup = new mapboxgl.Popup();
+
+        map.on('mousemove', function (e) {
+
+            var features = map.queryRenderedFeatures(e.point, {
+                layers: ['mtRec', 'mtAir']
+            });
+            if (!features.length) {
+                popup.remove();
+                return;
+            }
+
+            var feature = features[0];
+
+            popup.setLngLat(feature.geometry.coordinates)
+                .setHTML(feature.properties.FEATURE_NAME || feature.properties.NAME)
+                .addTo(map);
+
+            map.getCanvas().style.cursor = features.length ? 'pointer' : '';
+
+        });
+
+        map.on('click', function (e) {
+            var airFeatures = map.queryRenderedFeatures(e.point, {
+                layers: ['mtRec']
+            });
+            if (!airFeatures.length) {
+                return;
+            }
+
+            var airFeature = airFeatures[0];
+
+            console.log(airFeatures)
+
+            var nearestRec = turf.nearest(airFeature, ['mtAir']);
+
+            if (nearestRec !== null) {
+
+                map.getSource('nearest-recArea').setData({
+                    type: 'FeatureCollection',
+                    features: [nearestRec]
+                });
+
+                map.addLayer({
+                    id: 'nearest-recArea',
+                    type: 'circle',
+                    source: 'nearest-recArea',
+                    paint: {
+                        'circle-radius': 12,
+                        'circle-color': '#486DE0'
+                    }
+                }, 'mtRec');
+            }
+        });
+    </script>
+</body>
+
+</html>
