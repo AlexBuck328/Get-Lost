@@ -37,6 +37,7 @@
         });
 
         map.on('load', function () {
+            // Airports
             map.addSource('mtAirports', {
                 type: 'vector',
                 url: 'mapbox://alexbuck328.ckf1cqnw50ocx2cnppcrkj8ds-2bwo8' // update with your mapbox username and the tileset ID
@@ -63,15 +64,16 @@
                 }
             });
 
-
+            // Recreation Spots
             map.addSource('mtRec', {
                 type: 'vector',
-                url: 'mapbox://alexbuck328.ckf1ctvx807h225o9b2wc7rnz-2nubg' // update with your mapbox username and the tileset ID
+                url: 'mapbox://alexbuck328.ckf1ctvx807h225o9b2wc7rnz-2nubg'
+                // update with your mapbox username and the tileset ID
             });
 
             // add rec icon for location marker
             map.loadImage('https://upload.wikimedia.org/wikipedia/commons/e/ea/TrailMarker.png',
-            // https://upload.wikimedia.org/wikipedia/commons/0/0c/SharedUseMarkerSymbol.png',
+                // https://upload.wikimedia.org/wikipedia/commons/0/0c/SharedUseMarkerSymbol.png',
                 function (error, image) {
                     if (error) throw error;
                     map.addImage('rec', image);
@@ -99,8 +101,7 @@
                 }
             });
 
-
-        }) // add layers
+        }); // end add layers
 
 
         var popup = new mapboxgl.Popup();
@@ -127,7 +128,7 @@
 
         map.on('click', function (e) {
             var airFeatures = map.queryRenderedFeatures(e.point, {
-                layers: ['mtRec']
+                layers: ['mtAir']
             });
             if (!airFeatures.length) {
                 return;
@@ -137,7 +138,7 @@
 
             console.log(airFeatures)
 
-            var nearestRec = turf.nearest(airFeature, ['mtAir']);
+            var nearestRec = turf.nearest(airFeature, 'mtRec');
 
             if (nearestRec !== null) {
 
