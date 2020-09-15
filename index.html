@@ -5,10 +5,9 @@
     <meta charset='utf-8' />
     <title>Montata Recreation</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js'></script>
+
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css' rel='stylesheet' />
-    <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
-    <script src="https://d3js.org/d3-fetch.v1.min.js"></script>
+
     <style>
         body {
             margin: 0;
@@ -26,6 +25,12 @@
 
 <body>
     <div id='map'></div>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js'></script>
+    <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+    <script src="https://d3js.org/d3-fetch.v1.min.js"></script>
+    <script src="data/parks.js"></script>
+    <script src="data/mtAir.js"></script>
+
     <script>
         mapboxgl.accessToken =
             'pk.eyJ1IjoiYWxleGJ1Y2szMjgiLCJhIjoiY2szcDZsdmFsMW9rbDNubjMydm9rNGJpMyJ9.05szss9EHEoVBbGYajbPZA';
@@ -36,12 +41,16 @@
             zoom: 5.56 // starting zoom
         });
 
+        console.log(parks)
+
+        console.log(mtAir)
+
         map.on('load', function () {
             // Airports
-            map.addSource('mtAirports', {
-                type: 'vector',
-                url: 'mapbox://alexbuck328.ckf1cqnw50ocx2cnppcrkj8ds-2bwo8' // update with your mapbox username and the tileset ID
-            });
+            //    map.addSource('mtAirports', {
+            //        type: 'vector',
+            //        url: 'mapbox://alexbuck328.ckf1cqnw50ocx2cnppcrkj8ds-2bwo8' // update with your mapbox username and the tileset ID
+            //    });
 
             // add plane icon for location marker
             map.loadImage('https://upload.wikimedia.org/wikipedia/commons/a/a4/Map_symbol_airport_02.png',
@@ -51,25 +60,41 @@
                 });
 
             // add airport locations to map
+            //    map.addLayer({
+            //        'id': 'mtAir', // provide an id for later reference
+            //        'type': 'circle',
+            //        'source': 'mtAirports', // refers to the source name we entered above
+            //        'source-layer': 'mtAirports', // refers to the name of the tileset hosted on Mapbox Studio
+            //        'type': 'symbol',
+            //        'layout': {
+            //            'icon-image': 'plane',
+            //            'icon-size': .04,
+            //            'icon-allow-overlap': true,
+            //        }
+            //    });
+
+
             map.addLayer({
-                'id': 'mtAir', // provide an id for later reference
-                'type': 'circle',
-                'source': 'mtAirports', // refers to the source name we entered above
-                'source-layer': 'mtAirports', // refers to the name of the tileset hosted on Mapbox Studio
-                'type': 'symbol',
-                'layout': {
+                id: 'mtAir',
+                type: 'symbol',
+                source: {
+                    type: 'geojson',
+                    data: mtAir
+                },
+                layout: {
                     'icon-image': 'plane',
-                    'icon-size': .04,
                     'icon-allow-overlap': true,
-                }
+                    'icon-size': .045,
+                },
+                paint: {}
             });
 
             // Recreation Spots
-            map.addSource('mtRec', {
-                type: 'vector',
-                url: 'mapbox://alexbuck328.ckf1ctvx807h225o9b2wc7rnz-2nubg'
-                // update with your mapbox username and the tileset ID
-            });
+            //    map.addSource('mtRec', {
+            //        type: 'vector',
+            //        url: 'mapbox://alexbuck328.ckf1ctvx807h225o9b2wc7rnz-2nubg'
+            // update with your mapbox username and the tileset ID
+            //    });
 
             // add rec icon for location marker
             map.loadImage('https://upload.wikimedia.org/wikipedia/commons/e/ea/TrailMarker.png',
@@ -79,19 +104,36 @@
                     map.addImage('rec', image);
                 });
 
-            // add recreation locations to map
+
             map.addLayer({
-                'id': 'mtRec', // provide an id for later reference
-                'type': 'circle',
-                'source': 'mtRec', // refers to the source name we entered above
-                'source-layer': 'mtRec', // refers to the name of the tileset hosted on Mapbox Studio
-                'type': 'symbol',
-                'layout': {
+                id: 'mtRec',
+                type: 'symbol',
+                source: {
+                    type: 'geojson',
+                    data: parks
+                },
+                layout: {
                     'icon-image': 'rec',
-                    'icon-size': .045,
                     'icon-allow-overlap': true,
-                }
+                    'icon-size': .045,
+                },
+                paint: {}
             });
+
+
+            // add recreation locations to map
+            //    map.addLayer({
+            //        'id': 'mtRec', // provide an id for later reference
+            //        'type': 'circle',
+            //        'source': 'mtRec', // refers to the source name we entered above
+            //        'source-layer': 'mtRec', // refers to the name of the tileset hosted on Mapbox Studio
+            //        'type': 'symbol',
+            //        'layout': {
+            //            'icon-image': 'rec',
+            //            'icon-size': .045,
+            //            'icon-allow-overlap': true,
+            //        }
+            //    });
 
             map.addSource('nearest-recArea', {
                 type: 'geojson',

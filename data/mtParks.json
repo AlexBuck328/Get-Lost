@@ -1,7 +1,6 @@
 {
 "type": "FeatureCollection",
 "name": "mtParks",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
 "features": [
 { "type": "Feature", "properties": { "OBJECTID": 531, "SITEID": 280091, "NAME": "West Shore", "WEB_PAGE": "http:\/\/stateparks.mt.gov\/west-shore", "BOAT_FAC": "Ramp (Concrete), Dock", "CAMPING": "Yes", "HUNTING": "NO HUNTING", "PDFMAP": null, "GlobalID": "9326df5b-cb0e-4c49-bb98-35a8724f8fe0", "HUNT_ACCES": "Refer to current hunting regulations for hunting and weapons restrictions.", "ACRES": 135, "LATITUDE": 47.952, "LONGITUDE": -114.192, "LMS_ID": 39754029, "STATEFP": 30 }, "geometry": { "type": "Point", "coordinates": [ -114.192013489412005, 47.952006509197503 ] } },
 { "type": "Feature", "properties": { "OBJECTID": 532, "SITEID": 280125, "NAME": "Lake Mary Ronan", "WEB_PAGE": "http:\/\/stateparks.mt.gov\/lake-mary-ronan", "BOAT_FAC": "Ramp (Concrete), Dock", "CAMPING": "Yes", "HUNTING": "HUNTING ALLOWED", "PDFMAP": null, "GlobalID": "b68b4734-1a36-477a-b8dc-2922fab9985c", "HUNT_ACCES": "Refer to current hunting regulations for hunting and weapons restrictions.", "ACRES": 118, "LATITUDE": 47.92738, "LONGITUDE": -114.38229, "LMS_ID": 39754035, "STATEFP": 30 }, "geometry": { "type": "Point", "coordinates": [ -114.382303522623005, 47.927386487371898 ] } },
