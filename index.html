@@ -70,7 +70,8 @@
             });
 
             // add rec icon for location marker
-            map.loadImage('https://upload.wikimedia.org/wikipedia/commons/0/0c/SharedUseMarkerSymbol.png',
+            map.loadImage('https://upload.wikimedia.org/wikipedia/commons/e/ea/TrailMarker.png',
+            // https://upload.wikimedia.org/wikipedia/commons/0/0c/SharedUseMarkerSymbol.png',
                 function (error, image) {
                     if (error) throw error;
                     map.addImage('rec', image);
@@ -85,7 +86,7 @@
                 'type': 'symbol',
                 'layout': {
                     'icon-image': 'rec',
-                    'icon-size': .04,
+                    'icon-size': .045,
                     'icon-allow-overlap': true,
                 }
             });
