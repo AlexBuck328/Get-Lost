@@ -43,7 +43,7 @@
 
         console.log(parks)
 
-        console.log(mtAir)
+        console.log(airports)
 
         map.on('load', function () {
           
@@ -60,7 +60,7 @@
                 type: 'symbol',
                 source: {
                     type: 'geojson',
-                    data: mtAir
+                    data: airports
                 },
                 layout: {
                     'icon-image': 'plane',
@@ -95,7 +95,7 @@
             });
 
             // empty json to hold nearest rec data
-            map.addSource('nearest-recArea', {
+            map.addSource('nearest-airport', {
                 type: 'geojson',
                 data: {
                     type: 'FeatureCollection',
@@ -129,36 +129,36 @@
         });
 
         map.on('click', function (e) {
-            var airFeatures = map.queryRenderedFeatures(e.point, {
-                layers: ['mtAir']
+            var recFeatures = map.queryRenderedFeatures(e.point, {
+                layers: ['mtRec']
             });
-            if (!airFeatures.length) {
+            if (!recFeatures.length) {
                 return;
             }
 
-            var airFeature = airFeatures[0];
+            var recFeature = recFeatures[0];
 
-            console.log(airFeatures)
+            console.log(recFeatures)
 
-            var nearestRec = turf.nearest(airFeature, parks);
+            var nearestAirport = turf.nearest(recFeature, airports);
 
-            if (nearestRec !== null) {
+            if (nearestAirport !== null) {
 
-                map.getSource('nearest-recArea').setData({
+                map.getSource('nearest-airport').setData({
                     type: 'FeatureCollection',
-                    features: [nearestRec]
+                    features: [nearestAirport]
                 });
 
                 map.addLayer({
-                    id: 'nearest-recArea',
+                    id: 'nearest-airport',
                     type: 'circle',
-                    source: 'nearest-recArea',
+                    source: 'nearest-airport',
                     paint: {
                         'circle-radius': 12,
                         'circle-color': '#f7fcb9'
                         // '#486DE0'
                     }
-                }, 'mtRec');
+                }, 'mtAir');
             }
         });
     </script>
