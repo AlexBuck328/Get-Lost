@@ -24,7 +24,7 @@
         }
 
         a {
-        color: lightgray
+            color: lightgray
         }
     </style>
 </head>
@@ -76,6 +76,7 @@
     <script src="https://d3js.org/d3-fetch.v1.min.js"></script>
     <script src="data/parks.js"></script>
     <script src="data/mtAir.js"></script>
+    <script src="data/roadsEdit.js"></script>
 
     <script>
         mapboxgl.accessToken =
@@ -90,6 +91,8 @@
         console.log(parks)
 
         console.log(airports)
+
+        console.log(mtRoads)
 
         map.on('load', function () {
 
@@ -140,6 +143,23 @@
                 paint: {}
             });
 
+            map.addLayer({
+                id: 'mtRoads',
+                type: 'line',
+                source: {
+                    type: 'geojson',
+                    data: mtRoads
+                },
+                'layout': {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                'paint': {
+                    'line-color': 'pink',
+                    'line-width': 12
+                }
+            })
+
             // empty json to hold nearest rec data
             map.addSource('nearest-airport', {
                 type: 'geojson',
@@ -184,9 +204,11 @@
 
             var recFeature = recFeatures[0];
 
-            console.log(recFeatures)
+            console.log(recFeature)
 
             var nearestAirport = turf.nearest(recFeature, airports);
+
+            console.log(nearestAirport.properties.distanceToPoint)
 
             if (nearestAirport !== null) {
 
@@ -202,10 +224,12 @@
                     paint: {
                         'circle-radius': 12,
                         'circle-color': '#f7fcb9'
-                        // '#486DE0'
                     }
                 }, 'mtAir');
             }
+
+            popup.setHTML(`Nearest Airport: ${nearestAirport.properties.FEATURE_NAME} is
+            ${nearestAirport.properties.distanceToPoint} miles away`)
         });
     </script>
 </body>
