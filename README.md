@@ -1,2 +1,2 @@
 # Get-Lost
-Useful tool for planning your Montana outdoor adventure. Select an airport and see the nearest recreation spots and their available amenities/activities
+Useful tool for planning your Montana outdoor adventure. Select a recreation spot to find the distance to the nearest airport.
