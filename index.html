@@ -143,22 +143,22 @@
                 paint: {}
             });
 
-            map.addLayer({
-                id: 'mtRoads',
-                type: 'line',
-                source: {
-                    type: 'geojson',
-                    data: mtRoads
-                },
-                'layout': {
-                    'line-join': 'round',
-                    'line-cap': 'round'
-                },
-                'paint': {
-                    'line-color': 'pink',
-                    'line-width': 12
-                }
-            })
+        //    map.addLayer({
+        //        id: 'mtRoads',
+        //        type: 'line',
+        //        source: {
+        //            type: 'geojson',
+        //            data: mtRoads
+        //        },
+        //        'layout': {
+        //            'line-join': 'round',
+        //            'line-cap': 'round'
+        //        },
+        //        'paint': {
+        //            'line-color': 'pink',
+        //            'line-width': 12
+        //        }
+        //    })
 
             // empty json to hold nearest rec data
             map.addSource('nearest-airport', {
@@ -171,28 +171,49 @@
 
         }); // end add layers
 
+        // Rec info popup
+        var popupRec = new mapboxgl.Popup();
 
-        var popup = new mapboxgl.Popup();
+        // Air info popup
+        var popupAir = new mapboxgl.Popup();
 
         map.on('mousemove', function (e) {
-
-            var features = map.queryRenderedFeatures(e.point, {
-                layers: ['mtRec', 'mtAir']
+            // REC POPUP
+            var featuresRec = map.queryRenderedFeatures(e.point, {
+                layers: ['mtRec']
             });
-            if (!features.length) {
+            if (!featuresRec.length) {
                 popup.remove();
                 return;
             }
 
-            var feature = features[0];
+            var featureRec = featuresRec[0];
 
-            popup.setLngLat(feature.geometry.coordinates)
-                .setHTML(feature.properties.FEATURE_NAME || feature.properties.NAME)
+            popupRec.setLngLat(featureRec.geometry.coordinates)
+                .setHTML(`${featureRec.properties.NAME}`) //feature.properties.FEATURE_NAME ||
                 .addTo(map);
 
-            map.getCanvas().style.cursor = features.length ? 'pointer' : '';
+            map.getCanvas().style.cursor = featuresRec.length ? 'pointer' : '';
 
         });
+
+        map.on('mouseenter', function (e) {
+            var featuresAir = map.queryRenderedFeatures(e.point, {
+                layers: ['mtAir']
+            });
+            if (!featuresAir.length) {
+                popup.remove();
+                return;
+            }
+
+            var featureAir = featuresAir[0];
+
+            popupAir.setLngLat(featureAir.geometry.coordinates)
+                .setHTML(`${featureAir.properties.FEATURE_NAME}`) //feature.properties.FEATURE_NAME ||
+                .addTo(map);
+
+            map.getCanvas().style.cursor = featuresAir.length ? 'pointer' : '';
+        })
 
         map.on('click', function (e) {
             var recFeatures = map.queryRenderedFeatures(e.point, {
@@ -227,9 +248,12 @@
                     }
                 }, 'mtAir');
             }
-
-            popup.setHTML(`Nearest Airport: ${nearestAirport.properties.FEATURE_NAME} is
-            ${nearestAirport.properties.distanceToPoint} miles away`)
+            // center the map on clicked Rec feature
+            map.flyTo({
+                center: recFeature.geometry.coordinates,
+                zoom: 8.5,
+            });
+            // console.log(recFeature.geometry.coordinates)
         });
     </script>
 </body>
