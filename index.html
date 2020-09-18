@@ -3,7 +3,7 @@
 
 <head>
     <meta charset='utf-8' />
-    <title>Montata Recreation</title>
+    <title>Get Lost...in Montata!</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
         integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
@@ -44,7 +44,7 @@
                     Recreation data: <a target="_blank"
                         href="https://gis-mtfwp.opendata.arcgis.com/datasets/montana-fish-wildlife-parks-lands">Montana
                         Fish, Wildlife & Parks</a><br>
-                    Airport data: <a target="_blank"
+                    Airport and Forest data: <a target="_blank"
                         href="https://mslservices.mt.gov/Geographic_Information/Data/DataList/datalist_Details.aspx?did=%7B0c57ebe2-f8e8-4d55-b159-ab3202898956%7D">Montana
                         Geographic Names Framework</a>
                 </span>
@@ -55,7 +55,6 @@
                 data-target="#navbarToggleExternalContent" aria-expanded="true" aria-controls="collapseOne">
                 Click Here To Get Lost...
             </button>
-            <!--btn btn-link btn-block text-center-->
         </nav>
     </div>
 
@@ -76,7 +75,7 @@
     <script src="https://d3js.org/d3-fetch.v1.min.js"></script>
     <script src="data/parks.js"></script>
     <script src="data/mtAir.js"></script>
-    <script src="data/roadsEdit.js"></script>
+    <script src="data/forests.js"></script>
 
     <script>
         mapboxgl.accessToken =
@@ -88,11 +87,10 @@
             zoom: 6.039 // starting zoom
         });
 
+        // verify data is accessible
         console.log(parks)
-
         console.log(airports)
-
-        console.log(mtRoads)
+        console.log(forests)
 
         map.on('load', function () {
 
@@ -143,24 +141,23 @@
                 paint: {}
             });
 
-        //    map.addLayer({
-        //        id: 'mtRoads',
-        //        type: 'line',
-        //        source: {
-        //            type: 'geojson',
-        //            data: mtRoads
-        //        },
-        //        'layout': {
-        //            'line-join': 'round',
-        //            'line-cap': 'round'
-        //        },
-        //        'paint': {
-        //            'line-color': 'pink',
-        //            'line-width': 12
-        //        }
-        //    })
+            // add forest data
+            map.addLayer({
+                id: 'mtForests',
+                type: 'symbol',
+                source: {
+                    type: 'geojson',
+                    data: forests
+                },
+                layout: {
+                    'icon-image': 'rec',
+                    'icon-allow-overlap': true,
+                    'icon-size': .045,
+                },
+                paint: {}
+            });
 
-            // empty json to hold nearest rec data
+            // empty json to hold nearest airport data
             map.addSource('nearest-airport', {
                 type: 'geojson',
                 data: {
@@ -171,38 +168,42 @@
 
         }); // end add layers
 
-        // Rec info popup
+        // Empty popups to be filled with data below
         var popupRec = new mapboxgl.Popup();
-
-        // Air info popup
         var popupAir = new mapboxgl.Popup();
+        var popupForest = new mapboxgl.Popup();
 
+        // Recreation popup info
         map.on('mousemove', function (e) {
-            // REC POPUP
             var featuresRec = map.queryRenderedFeatures(e.point, {
                 layers: ['mtRec']
             });
             if (!featuresRec.length) {
-                popup.remove();
+                popupRec.remove();
                 return;
             }
 
             var featureRec = featuresRec[0];
 
             popupRec.setLngLat(featureRec.geometry.coordinates)
-                .setHTML(`${featureRec.properties.NAME}`) //feature.properties.FEATURE_NAME ||
+                .setHTML(`<b>Name:</b> ${featureRec.properties.NAME}<br> 
+                         <b>Acreage:</b> ${featureRec.properties.ACRES.toLocaleString()} Acres<br>
+                         <b>Boat Fac:</b> ${featureRec.properties.BOAT_FAC}<br>
+                         <b>Hunting:</b> ${featureRec.properties.HUNTING}<br>
+                         <b>Camping:</b> ${featureRec.properties.CAMPING}<br>`) //feature.properties.FEATURE_NAME ||
                 .addTo(map);
 
             map.getCanvas().style.cursor = featuresRec.length ? 'pointer' : '';
 
         });
 
-        map.on('mouseenter', function (e) {
+        // Airport popup info
+        map.on('mousemove', function (e) {
             var featuresAir = map.queryRenderedFeatures(e.point, {
-                layers: ['mtAir']
+                layers: ['mtAir', ]
             });
             if (!featuresAir.length) {
-                popup.remove();
+                popupAir.remove();
                 return;
             }
 
@@ -215,9 +216,29 @@
             map.getCanvas().style.cursor = featuresAir.length ? 'pointer' : '';
         })
 
+        // Forest popup info
+        map.on('mousemove', function (e) {
+            var featuresForest = map.queryRenderedFeatures(e.point, {
+                layers: ['mtForests', ]
+            });
+            if (!featuresForest.length) {
+                popupForest.remove();
+                return;
+            }
+
+            var featureForest = featuresForest[0];
+
+            popupForest.setLngLat(featureForest.geometry.coordinates)
+                .setHTML(`${featureForest.properties.FEATURE_NAME}`) //feature.properties.FEATURE_NAME ||
+                .addTo(map);
+
+            map.getCanvas().style.cursor = featuresForest.length ? 'pointer' : '';
+        })
+
+        // on rec feature click, center map on that feature, highlight nearest airport and display adventure awaits popup
         map.on('click', function (e) {
             var recFeatures = map.queryRenderedFeatures(e.point, {
-                layers: ['mtRec']
+                layers: ['mtRec', 'mtForests']
             });
             if (!recFeatures.length) {
                 return;
@@ -225,11 +246,7 @@
 
             var recFeature = recFeatures[0];
 
-            console.log(recFeature)
-
             var nearestAirport = turf.nearest(recFeature, airports);
-
-            console.log(nearestAirport.properties.distanceToPoint)
 
             if (nearestAirport !== null) {
 
@@ -248,12 +265,22 @@
                     }
                 }, 'mtAir');
             }
+
             // center the map on clicked Rec feature
             map.flyTo({
                 center: recFeature.geometry.coordinates,
                 zoom: 8.5,
             });
-            // console.log(recFeature.geometry.coordinates)
+
+            // Adventure awaits popup data
+            var coordinates = recFeature.geometry.coordinates
+            var description = nearestAirport.properties.distanceToPoint
+
+            // Adventure awaits popup
+            new mapboxgl.Popup()
+                .setLngLat(coordinates)
+                .setHTML(`Your adventure starts just ${description.toLocaleString()} miles from ${nearestAirport.properties.FEATURE_NAME}!`)
+                .addTo(map);
         });
     </script>
 </body>
