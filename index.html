@@ -3,7 +3,7 @@
 
 <head>
     <meta charset='utf-8' />
-    <title>Get Lost...in Montata!</title>
+    <title>Get Lost... in Montata!</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
         integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
@@ -36,9 +36,11 @@
                 <h5 class="text-white h4 text-center">Every Adventure Starts With The First Step</h5>
                 <span class="text-muted">If you're like everyone else during the COVID-19 Pandemic, you're probably
                     experiencing some cabin fever. Well, the cure for that is a little fresh air! An excellent place to
-                    socially distance is a location that has been socially distancing since before "social distancing"
+                    socially distance is a state that has been socially distancing since before "social distancing"
                     was even a part of our vocabulary. Montana offers a world of opportunity to the outdoorsy-side in
-                    all of us. Plan your adventure by clicking a recreation location, to display the nearest airport.
+                    all of us. However, accessing these remote locations can be a trick. That's where this nifty map
+                    comes in handy! Plan your adventure by clicking a recreation location, to display the nearest
+                    airport.
                     <br><br>
                     Data:<br>
                     Recreation data: <a target="_blank"
@@ -279,7 +281,9 @@
             // Adventure awaits popup
             new mapboxgl.Popup()
                 .setLngLat(coordinates)
-                .setHTML(`Your adventure starts just ${description.toLocaleString()} miles from ${nearestAirport.properties.FEATURE_NAME}!`)
+                .setHTML(
+                    `Your adventure starts just ${description.toLocaleString()} miles from ${nearestAirport.properties.FEATURE_NAME}!`
+                    )
                 .addTo(map);
         });
     </script>
